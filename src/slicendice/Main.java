@@ -13,6 +13,8 @@ public class Main
     public static int dirSpeed = 8;
     public static int controlMoveSpeed = 5;
     public static int moveSpeed = 10;
+    public static int initHealth = 100;
+    public static int healthBarWidth = 8;
 
     long duration = 0;
     

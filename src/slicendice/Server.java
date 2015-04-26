@@ -190,6 +190,13 @@ public class Server{
                             playerDataRecieved++;                    
                         }
                     }
+                    else if(input.startsWith("GAMEOVER")){
+                        textLog+= input.substring(9)+"~n`";
+                        for (PrintWriter writer : writers) {
+                            writer.println("NEWGAME"+textLog);
+                        }  
+                        messageArea.setText(Main.decodeLine(textLog.substring(8)));
+                    }
                     else{
                         textLog+= name + ": " + input+"~n`";
                         //send message recieved to every client

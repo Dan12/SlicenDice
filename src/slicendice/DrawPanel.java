@@ -104,7 +104,7 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
         AIs = new ArrayList<Player>();
         Player temp = new Player(1000, 400, "AI 1", false);
         temp.setPath(new int[]{200,400,400,200}, new int[]{200,200,400,400});
-        AIs.add(temp);
+        //AIs.add(temp);
     }
 
 
@@ -119,7 +119,6 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
             }
             long start = System.nanoTime();
             while(settingSharedObject){System.out.println("Waiting in run");}
-            actions();
             super.repaint();
             long end = System.nanoTime();
             duration = ((end-start)/1000000);
@@ -130,8 +129,6 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
     public void actions(){
         character.updatePosition(lAC, rAC, uAC, dAC, ctAC);
         
-        character.playerInteractions(AIs.get(0));
-        
         for(Player p : AIs)
             p.updatePosition();
 
@@ -141,6 +138,8 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
             character.setPosistion(Main.screenWidth/2, character.yPos);   
             for(int i = 0; i < AIs.size(); i++)
                 AIs.get(i).changePosition(mapOffXInit-map.offsetX, 0);
+            for(int i = 0; i < players.size(); i++)
+                players.get(i).changePosition(mapOffXInit-map.offsetX, 0);
         }   
         if((character.yPos>=Main.screenHeight/2 && map.mapPixelHeight-map.offsetY>Main.screenHeight) || (character.yPos<=Main.screenHeight/2 && map.offsetY>0)){
             int mapOffYInit = map.offsetY;
@@ -148,6 +147,8 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
             character.setPosistion(character.xPos, Main.screenHeight/2);   
             for(int i = 0; i < AIs.size(); i++)
                 AIs.get(i).changePosition(0, mapOffYInit-map.offsetY);
+            for(int i = 0; i < players.size(); i++)
+                players.get(i).changePosition(0, mapOffYInit-map.offsetY);
         }
     }
 
@@ -161,10 +162,9 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
       while(settingSharedObject){System.out.println("Waiting in Paint");}
       drawingSharedObject = true;
       for(int i = 0; i < players.size(); i++){
-          if(!players.get(i).playerName.equals(clientName))
+        if(!players.get(i).playerName.equals(clientName))
               players.get(i).drawCharacter(g);
       }
-      drawingSharedObject = false;
 
       for(int i = 0; i < AIs.size(); i++){
           AIs.get(i).drawCharacter(g);
@@ -175,7 +175,28 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
       g.setColor(Color.BLACK);
       g.fillRect(Main.screenWidth, 0, Main.screenPlusMessage-Main.screenWidth, Main.screenHeight);
 
-      if(clientName != null)
+      boolean onlyOneLeft = true;
+      for(int i = 0; i < players.size(); i++){
+            if(!players.get(i).playerName.equals(clientName) && players.get(i).isAlive)
+                onlyOneLeft = false;
+            if(character.isAlive && players.get(i).isAlive && !players.get(i).playerName.equals(clientName)){
+                character.playerInteractions(players.get(i));
+                if(!character.isAlive)
+                    Client.clientOut.println(character.playerName+" slain by "+players.get(i).playerName);
+            }
+      }
+      actions();
+      drawingSharedObject = false;
+      
+      if(!onlyOneLeft)
+          character.wonGame = false;
+      
+      if(onlyOneLeft && players.size() > 1 && !character.wonGame){
+          Client.clientOut.println("GAMEOVER "+character.playerName+" won the match");
+          character.wonGame = true;
+      }
+      
+      if(clientName != null )
         Client.clientOut.println("SQUARE "+character.getInfoString(map.offsetX, map.offsetY));
     }
 

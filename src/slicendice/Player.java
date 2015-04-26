@@ -28,6 +28,9 @@ public class Player {
     private Font font;
     private int fontSize = Main.circleRad;
     private Random r = new Random();
+    private int health = Main.initHealth;
+    public boolean isAlive = true;
+    public boolean wonGame = false;
     
     public Player(int x, int y, String n, boolean m){
         xPos = x;
@@ -50,8 +53,7 @@ public class Player {
     }
     
     public Player(String[] s, int ox, int oy){
-        mapCentered = false;
-        
+        mapCentered = false; 
         playerName = s[0];
         xPos = Integer.parseInt(s[1]);
         yPos = Integer.parseInt(s[2]);
@@ -60,14 +62,73 @@ public class Player {
         int otherOY = Integer.parseInt(s[5]);
         xPos = (xPos+otherOX)-ox;
         yPos = (yPos+otherOY)-oy;
+        doubleXPos = xPos;
+        doubleYPos = yPos;
+        triangle = new Polygon();
+        triangle.addPoint(xPos-Main.circleRad, yPos);
+        triangle.addPoint(xPos, yPos-Main.triangleHeight);
+        triangle.addPoint(xPos+Main.circleRad, yPos);
+        stabPoint = new Point(xPos, yPos-Main.triangleHeight);
+        c = new Color(Integer.parseInt(s[6]),Integer.parseInt(s[7]),Integer.parseInt(s[8]));
+        changePosition(0, 0);
+        nameWidth = -1;
+        font = new Font("Arial",Font.BOLD,fontSize);
+        health = Integer.parseInt(s[9]);
+        gotHit(0);
     }
     
     public void playerInteractions(Player other){
-        if(rectIntersect(xPos-Main.circleRad, yPos-Main.triangleHeight, Main.circleRad*2, Main.circleRad+Main.triangleHeight, other.xPos-Main.circleRad, other.yPos-Main.triangleHeight, Main.circleRad*2, Main.circleRad+Main.triangleHeight)){
-            if(distSquared(xPos, yPos, other.xPos, other.yPos)<=Main.circleRad*Main.circleRad*4){
-                
+        if(rectIntersect(xPos-Main.triangleHeight, yPos-Main.triangleHeight, Main.triangleHeight*2, Main.triangleHeight*2, other.xPos-Main.triangleHeight, other.yPos-Main.triangleHeight, Main.triangleHeight*2, Main.triangleHeight*2)){
+            boolean stabPointInt = false;
+            boolean circlesTouch = false;
+            if(distSquared(xPos, yPos, other.xPos, other.yPos)<=Main.circleRad*Main.circleRad*4)
+                circlesTouch = true;
+            if(distSquared(other.stabPoint.x, other.stabPoint.y, xPos, yPos)<=Main.circleRad*Main.circleRad)
+                stabPointInt = true;
+            if(stabPointInt || circlesTouch){
+                if(circlesTouch){
+                    double cVal = Math.sqrt(distSquared(xPos, yPos, other.xPos, other.yPos));
+                    double zVal = Math.sqrt(Main.circleRad*Main.circleRad*4);
+                    int xSep = (int) ((((Math.abs(xPos-other.xPos)*zVal)/cVal)-Math.abs(xPos-other.xPos))/2);
+                    int ySep = (int) ((((Math.abs(yPos-other.yPos)*zVal)/cVal)-Math.abs(yPos-other.yPos))/2);
+                    if(xPos>other.xPos){
+                        changePosition(xSep, 0);
+                        other.changePosition(-xSep, 0);
+                    }
+                    else{
+                        changePosition(-xSep, 0);
+                        other.changePosition(xSep, 0);
+                    }
+                    if(yPos>other.yPos){
+                        changePosition(0, ySep);
+                        other.changePosition(0, -ySep);
+                    }
+                    else{
+                        changePosition(0, -ySep);
+                        other.changePosition(0, ySep);
+                    }
+                }
+                else{
+                    changePosition(other.stabPoint.x-other.xPos, other.stabPoint.y-other.yPos);
+                    gotHit(5);
+                    System.out.println("Hit"+xPos+","+yPos+","+other.xPos+","+other.yPos+",");
+                }
             }
         }
+    }
+    
+    public void gotHit(int d){
+        health-=d;
+        if(health <= 0){
+            isAlive = false;
+            c = Color.GRAY;
+        }
+    }
+    
+    public void newGame(){
+        health = Main.initHealth;
+        isAlive = true;
+        c = new Color(r.nextInt(100)+150,r.nextInt(100)+150,r.nextInt(100)+150);
     }
     
     public boolean rectIntersect(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2){
@@ -100,39 +161,52 @@ public class Player {
         g.setColor(Color.BLACK);
         g.drawString(playerName, xPos-nameWidth/2, yPos-(Main.circleRad*2+Main.circleRad/2));
         
+        g.setColor(Color.BLACK);
+        g.fillRect(xPos-Main.circleRad, yPos-Main.healthBarWidth/2, Main.circleRad*2, Main.healthBarWidth);
+        
+        g.setColor(Color.GREEN);
+        g.fillRect(xPos-Main.circleRad, yPos-(Main.healthBarWidth/2-2), (int) (((double)(health)/Main.initHealth)*Main.circleRad*2), Main.healthBarWidth-4);
+        
+        //g.fillOval(stabPoint.x, stabPoint.y, 4, 4);
+        
     }
     
     //No Path
     public void updatePosition(boolean lk, boolean rk, boolean uk, boolean dk, boolean ct){
-        if(lk){
-            if(ct)
-                direction+=Main.controlDirSpeed;
-            else
-                direction+=Main.dirSpeed;
-        }
-        if(rk){
-            if(ct)
-                direction-=Main.controlDirSpeed;
-            else
-                direction-=Main.dirSpeed;
-        }
-        if(uk){
-            if(ct)
-                changePosition(Math.cos(Math.toRadians(direction-90))*Main.controlMoveSpeed, Math.sin(Math.toRadians(direction-90))*Main.controlMoveSpeed);
-            else
-                changePosition(Math.cos(Math.toRadians(direction-90))*Main.moveSpeed, Math.sin(Math.toRadians(direction-90))*Main.moveSpeed); 
-        }
-        if(dk){
-            if(ct)
-                changePosition(-Math.cos(Math.toRadians(direction-90))*Main.controlMoveSpeed, -Math.sin(Math.toRadians(direction-90))*Main.controlMoveSpeed);
-            else
-                changePosition(-Math.cos(Math.toRadians(direction-90))*Main.moveSpeed, -Math.sin(Math.toRadians(direction-90))*Main.moveSpeed); 
+        if(isAlive){
+            if(lk){
+                if(ct)
+                    direction+=Main.controlDirSpeed;
+                else
+                    direction+=Main.dirSpeed;
+            }
+            if(rk){
+                if(ct)
+                    direction-=Main.controlDirSpeed;
+                else
+                    direction-=Main.dirSpeed;
+            }
+            if(uk){
+                if(ct)
+                    changePosition(Math.cos(Math.toRadians(direction-90))*Main.controlMoveSpeed, Math.sin(Math.toRadians(direction-90))*Main.controlMoveSpeed);
+                else
+                    changePosition(Math.cos(Math.toRadians(direction-90))*Main.moveSpeed, Math.sin(Math.toRadians(direction-90))*Main.moveSpeed); 
+            }
+            if(dk){
+                if(ct)
+                    changePosition(-Math.cos(Math.toRadians(direction-90))*Main.controlMoveSpeed, -Math.sin(Math.toRadians(direction-90))*Main.controlMoveSpeed);
+                else
+                    changePosition(-Math.cos(Math.toRadians(direction-90))*Main.moveSpeed, -Math.sin(Math.toRadians(direction-90))*Main.moveSpeed); 
+            }
+            changePosition(0, 0);
         }
     }
     
     //Has Path
     public void updatePosition(){
-    
+        if(isAlive){
+        
+        }
     }
     
     public void setPath(int[] xp, int[] yp){
@@ -152,9 +226,9 @@ public class Player {
         triangle.translate(actualCX, actualCY);
         xPos+=actualCX;
         yPos+=actualCY;
+        stabPoint.move((int) (xPos+Main.triangleHeight*Math.cos(Math.toRadians(direction-90))), (int) (yPos+Main.triangleHeight*Math.sin(Math.toRadians(direction-90))));
         if(mapCentered){
             if(xPos<0){
-                System.out.println("Hey");
                 setPosistion(0, yPos);
             }
             if(xPos>viewWidth)
@@ -172,6 +246,6 @@ public class Player {
     }
     
     public String getInfoString(int ox, int oy){
-        return playerName+","+xPos+","+yPos+","+direction+","+ox+","+oy;
+        return playerName+","+xPos+","+yPos+","+direction+","+ox+","+oy+","+c.getRed()+","+c.getGreen()+","+c.getBlue()+","+health;
     }
 }

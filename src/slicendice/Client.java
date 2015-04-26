@@ -87,8 +87,8 @@ public class Client{
                     drawPanel.textField.setEditable(true);
                 } else if (allLines.startsWith("MESSAGE")) {
                     drawPanel.messageArea.setText(allLines.substring(8));
-                    text = allLines.substring(8);
-                    System.out.println(text);
+                    //text = allLines.substring(8);
+                    //System.out.println(text);
                 }
                 else if (allLines.startsWith("SQUARE")){
                     if(!drawPanel.drawingSharedObject){
@@ -103,6 +103,10 @@ public class Client{
                         drawPanel.settingSharedObject = false;
                         drawPanel.drawingSharedObject = true;
                     }
+                }
+                else if (allLines.startsWith("NEWGAME")){
+                    drawPanel.character.newGame();
+                    drawPanel.messageArea.setText(allLines.substring(15));
                 }
             }
         }
