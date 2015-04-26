@@ -8,11 +8,9 @@ public class Main
     public static int PORT = 9001;
   
     public static int circleRad = 30;
-    public static int triangleHeight = 60;
-    public static int controlDirSpeed = 3;
-    public static int dirSpeed = 8;
-    public static int controlMoveSpeed = 5;
-    public static int moveSpeed = 10;
+    public static int triangleHeight = 70;
+    public static int dirSlowSpeed = 4;
+    public static int moveSlowSpeed = 5;
     public static int initHealth = 100;
     public static int healthBarWidth = 8;
 

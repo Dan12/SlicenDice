@@ -24,7 +24,6 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
     private boolean rAC = false;
     private boolean uAC = false;
     private boolean dAC = false;
-    private boolean ctAC = false;
     
     public TiledMap map;
     
@@ -127,7 +126,7 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
     }
 
     public void actions(){
-        character.updatePosition(lAC, rAC, uAC, dAC, ctAC);
+        character.updatePosition(lAC, rAC, uAC, dAC);
         
         for(Player p : AIs)
             p.updatePosition();
@@ -210,12 +209,10 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
             lAC = true;
         if(e.getKeyCode() == 37)
             rAC = true;
-        if(e.getKeyCode() == 38)
+        if(e.getKeyCode() == 90)
             uAC = true;
-        if(e.getKeyCode() == 40)
+        if(e.getKeyCode() == 88)
             dAC = true;
-        if(e.getKeyCode() == 16)
-            ctAC = true;
     }
 
     @Override
@@ -224,11 +221,9 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
             lAC = false;
         if(e.getKeyCode() == 37)
             rAC = false;
-        if(e.getKeyCode() == 38)
+        if(e.getKeyCode() == 90)
             uAC = false;
-        if(e.getKeyCode() == 40)
+        if(e.getKeyCode() == 88)
             dAC = false;
-        if(e.getKeyCode() == 16)
-            ctAC = false;
     }
 }

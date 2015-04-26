@@ -31,6 +31,7 @@ public class Player {
     private int health = Main.initHealth;
     public boolean isAlive = true;
     public boolean wonGame = false;
+    private int speedMult = 2;
     
     public Player(int x, int y, String n, boolean m){
         xPos = x;
@@ -172,33 +173,19 @@ public class Player {
     }
     
     //No Path
-    public void updatePosition(boolean lk, boolean rk, boolean uk, boolean dk, boolean ct){
+    public void updatePosition(boolean lk, boolean rk, boolean uk, boolean dk){
         if(isAlive){
-            if(lk){
-                if(ct)
-                    direction+=Main.controlDirSpeed;
-                else
-                    direction+=Main.dirSpeed;
-            }
-            if(rk){
-                if(ct)
-                    direction-=Main.controlDirSpeed;
-                else
-                    direction-=Main.dirSpeed;
-            }
-            if(uk){
-                if(ct)
-                    changePosition(Math.cos(Math.toRadians(direction-90))*Main.controlMoveSpeed, Math.sin(Math.toRadians(direction-90))*Main.controlMoveSpeed);
-                else
-                    changePosition(Math.cos(Math.toRadians(direction-90))*Main.moveSpeed, Math.sin(Math.toRadians(direction-90))*Main.moveSpeed); 
-            }
-            if(dk){
-                if(ct)
-                    changePosition(-Math.cos(Math.toRadians(direction-90))*Main.controlMoveSpeed, -Math.sin(Math.toRadians(direction-90))*Main.controlMoveSpeed);
-                else
-                    changePosition(-Math.cos(Math.toRadians(direction-90))*Main.moveSpeed, -Math.sin(Math.toRadians(direction-90))*Main.moveSpeed); 
-            }
-            changePosition(0, 0);
+            if(uk)
+                speedMult = 4;
+            if(dk)
+                speedMult = 1;
+            if((dk && uk) || (!dk && !uk))
+                speedMult = 2;
+            if(lk)
+                direction+=Main.dirSlowSpeed*speedMult;
+            if(rk)
+                direction-=Main.dirSlowSpeed*speedMult;
+            changePosition(Math.cos(Math.toRadians(direction-90))*Main.moveSlowSpeed*speedMult, Math.sin(Math.toRadians(direction-90))*Main.moveSlowSpeed*speedMult);
         }
     }
     
@@ -228,15 +215,15 @@ public class Player {
         yPos+=actualCY;
         stabPoint.move((int) (xPos+Main.triangleHeight*Math.cos(Math.toRadians(direction-90))), (int) (yPos+Main.triangleHeight*Math.sin(Math.toRadians(direction-90))));
         if(mapCentered){
-            if(xPos<0){
-                setPosistion(0, yPos);
+            if(xPos<Main.circleRad){
+                setPosistion(Main.circleRad, yPos);
             }
-            if(xPos>viewWidth)
-                setPosistion(viewWidth, yPos);
-            if(yPos<0)
-                setPosistion(xPos, 0);
-            if(yPos>viewHeight)
-                setPosistion(xPos, viewHeight);
+            if(xPos>viewWidth-Main.circleRad)
+                setPosistion(viewWidth-Main.circleRad, yPos);
+            if(yPos<Main.circleRad)
+                setPosistion(xPos, Main.circleRad);
+            if(yPos>viewHeight-Main.circleRad)
+                setPosistion(xPos, viewHeight-Main.circleRad);
         }
     }
     
