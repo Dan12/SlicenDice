@@ -87,7 +87,12 @@ public class Player {
             if(distSquared(other.stabPoint.x, other.stabPoint.y, xPos, yPos)<=Main.circleRad*Main.circleRad)
                 stabPointInt = true;
             if(stabPointInt || circlesTouch){
-                if(circlesTouch){
+                if(stabPointInt){
+                    changePosition((other.stabPoint.x-other.xPos)*2, (other.stabPoint.y-other.yPos)*2);
+                    gotHit(5);
+                    System.out.println("Hit at "+xPos+","+yPos+","+other.xPos+","+other.yPos+",");
+                }
+                else{
                     double cVal = Math.sqrt(distSquared(xPos, yPos, other.xPos, other.yPos));
                     double zVal = Math.sqrt(Main.circleRad*Main.circleRad*4);
                     int xSep = (int) ((((Math.abs(xPos-other.xPos)*zVal)/cVal)-Math.abs(xPos-other.xPos))/2);
@@ -108,11 +113,6 @@ public class Player {
                         changePosition(0, -ySep);
                         other.changePosition(0, ySep);
                     }
-                }
-                else{
-                    changePosition(other.stabPoint.x-other.xPos, other.stabPoint.y-other.yPos);
-                    gotHit(5);
-                    System.out.println("Hit"+xPos+","+yPos+","+other.xPos+","+other.yPos+",");
                 }
             }
         }

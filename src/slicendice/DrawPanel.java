@@ -204,7 +204,7 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
 
     @Override
     public void keyPressed(KeyEvent e){
-        System.out.println(e.getKeyCode());
+        //System.out.println(e.getKeyCode());
         if(e.getKeyCode() == 39)
             lAC = true;
         if(e.getKeyCode() == 37)
