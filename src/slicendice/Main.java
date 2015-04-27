@@ -13,6 +13,7 @@ public class Main
     public static int moveSlowSpeed = 5;
     public static int initHealth = 100;
     public static int healthBarWidth = 8;
+    public static int hitDamage = 5;
 
     long duration = 0;
     

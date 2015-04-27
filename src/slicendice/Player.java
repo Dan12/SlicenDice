@@ -89,7 +89,7 @@ public class Player {
             if(stabPointInt || circlesTouch){
                 if(stabPointInt){
                     changePosition((other.stabPoint.x-other.xPos)*2, (other.stabPoint.y-other.yPos)*2);
-                    gotHit(5);
+                    gotHit(Main.hitDamage);
                     System.out.println("Hit at "+xPos+","+yPos+","+other.xPos+","+other.yPos+",");
                 }
                 else{
