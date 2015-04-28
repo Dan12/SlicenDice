@@ -46,7 +46,7 @@ public class Main
         String temp = "";
         String[] lineSplit = inLines.split("~n`");
         if(inLines.startsWith("SQUARE")){
-            temp = "SQUARE";
+            temp = "SQUARE ";
             String subbed = lineSplit[0].substring(7);
             String[] globalVars = subbed.split(",");
             Main.circleRad = Integer.parseInt(globalVars[0]);

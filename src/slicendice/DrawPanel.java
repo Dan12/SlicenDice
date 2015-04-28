@@ -105,7 +105,7 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
         AIs = new ArrayList<Player>();
         Player temp = new Player(400, 600, "AI 1", false);
         temp.setPath(new int[]{400,0,-400,0}, new int[]{0,400,0,-400});
-        AIs.add(temp);
+        //AIs.add(temp);
     }
 
 
