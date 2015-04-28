@@ -45,8 +45,25 @@ public class Main
     public static String decodeLine(String inLines){
         String temp = "";
         String[] lineSplit = inLines.split("~n`");
-        for(int i = 0; i < lineSplit.length; i++)
-            temp+=lineSplit[i]+"\n";
-        return temp;
+        if(inLines.startsWith("SQUARE")){
+            temp = "SQUARE";
+            String subbed = lineSplit[0].substring(7);
+            String[] globalVars = subbed.split(",");
+            Main.circleRad = Integer.parseInt(globalVars[0]);
+            Main.triangleHeight = Integer.parseInt(globalVars[1]);
+            Main.dirSlowSpeed = Integer.parseInt(globalVars[2]);
+            Main.moveSlowSpeed = Integer.parseInt(globalVars[3]);
+            Main.initHealth = Integer.parseInt(globalVars[4]);
+            Main.healthBarWidth = Integer.parseInt(globalVars[5]);
+            Main.hitDamage = Integer.parseInt(globalVars[6]);
+            for(int i = 1; i < lineSplit.length; i++)
+                temp+=lineSplit[i]+"\n";
+            return temp;
+        }
+        else{
+            for(int i = 0; i < lineSplit.length; i++)
+                temp+=lineSplit[i]+"\n";
+            return temp;
+        }
     }
 }

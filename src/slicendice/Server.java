@@ -38,7 +38,7 @@ public class Server{
     JTextArea messageArea = new JTextArea(8, 40);
     private String textLog = "MESSAGE ";
     private int playerDataRecieved = 0;
-    private String dataOutLine = "SQUARE ";
+    private String dataOutLine = "SQUARE "+Main.circleRad+","+Main.triangleHeight+","+Main.dirSlowSpeed+","+Main.moveSlowSpeed+","+Main.initHealth+","+Main.healthBarWidth+","+Main.hitDamage+"~n`";
     private ArrayList<Handler> handlers = new ArrayList<Handler>();
 
     public Server(){
@@ -110,7 +110,7 @@ public class Server{
                         writer.println(dataOutLine);
                     }  
                     playerDataRecieved = 0;
-                    dataOutLine = "SQUARE ";
+                    dataOutLine = "SQUARE "+Main.circleRad+","+Main.triangleHeight+","+Main.dirSlowSpeed+","+Main.moveSlowSpeed+","+Main.initHealth+","+Main.healthBarWidth+","+Main.hitDamage+"~n`";
                 }
             }
         }

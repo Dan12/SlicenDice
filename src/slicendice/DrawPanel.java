@@ -97,7 +97,7 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
         
         String filePath = new File("").getAbsolutePath();
         //map = new TiledMap(filePath.concat("/src/src/res"), "desert-tiled.txt");
-        map = new TiledMap(filePath.concat("/src/res"), "desert-tiled_1.txt");
+        map = new TiledMap(filePath.concat("/src/res"), "test.txt");
 
         character = new Player(200, 200, "-", true);
         players = new ArrayList<Player>();
@@ -105,7 +105,7 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
         AIs = new ArrayList<Player>();
         Player temp = new Player(400, 600, "AI 1", false);
         temp.setPath(new int[]{400,0,-400,0}, new int[]{0,400,0,-400});
-        //AIs.add(temp);
+        AIs.add(temp);
     }
 
 
