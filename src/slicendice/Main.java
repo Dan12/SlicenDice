@@ -7,13 +7,13 @@ public class Main
   // Declare instance variables here...
     public static int PORT = 9001;
   
-    public static int circleRad = 30;
-    public static int triangleHeight = 70;
-    public static int dirSlowSpeed = 4;
+    public static int circleRad = 60;
+    public static int triangleHeight = 130;
+    public static int dirSlowSpeed = 3;
     public static int moveSlowSpeed = 5;
-    public static int initHealth = 100;
+    public static int initHealth = 80;
     public static int healthBarWidth = 8;
-    public static int hitDamage = 5;
+    public static int hitDamage = 10;
 
     long duration = 0;
     

@@ -1,4 +1,4 @@
-<file-name=tmw_desert_spacing.png,tile-width=32,tile-height=32,tile-padding=1,tile-scale=2,rows=6,cols=8,map-tile-width=40,map-tile-height=40>
+<file-name=tmw_desert_spacing.png,tile-width=32,tile-height=32,tile-padding=1,tile-scale=3,rows=6,cols=8,map-tile-width=40,map-tile-height=40>
 <g,tile-row=2,tile-col=2,x-s=1,y-s=1,x-e=40,y-e=2>
 <g,tile-row=2,tile-col=2,x-s=1,y-s=3,x-e=2,y-e=40>
 <t,tile-row=3,tile-col=4,map-row=3,map-col=3>

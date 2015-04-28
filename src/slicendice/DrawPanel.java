@@ -20,10 +20,12 @@ import javax.swing.JTextField;
 
 public class DrawPanel extends JPanel implements Runnable,KeyListener{
         
-    private boolean lAC = false;
-    private boolean rAC = false;
-    private boolean uAC = false;
-    private boolean dAC = false;
+    private boolean lAK = false;
+    private boolean rAK = false;
+    private boolean wAK = false;
+    private boolean sAK = false;
+    private boolean aAK = false;
+    private boolean dAK = false;
     
     public TiledMap map;
     
@@ -101,8 +103,8 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
         players = new ArrayList<Player>();
 
         AIs = new ArrayList<Player>();
-        Player temp = new Player(1000, 400, "AI 1", false);
-        temp.setPath(new int[]{200,400,400,200}, new int[]{200,200,400,400});
+        Player temp = new Player(400, 600, "AI 1", false);
+        temp.setPath(new int[]{400,0,-400,0}, new int[]{0,400,0,-400});
         //AIs.add(temp);
     }
 
@@ -126,7 +128,7 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
     }
 
     public void actions(){
-        character.updatePosition(lAC, rAC, uAC, dAC);
+        character.updatePosition(lAK, rAK, wAK, sAK, aAK, dAK);
         
         for(Player p : AIs)
             p.updatePosition();
@@ -134,69 +136,80 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
         if((character.xPos>=Main.screenWidth/2 && map.mapPixelWidth-map.offsetX>Main.screenWidth) || (character.xPos<=Main.screenWidth/2 && map.offsetX>0)){
             int mapOffXInit = map.offsetX;
             map.changeOffset(character.xPos-Main.screenWidth/2, 0);
-            character.setPosistion(Main.screenWidth/2, character.yPos);   
-            for(int i = 0; i < AIs.size(); i++)
-                AIs.get(i).changePosition(mapOffXInit-map.offsetX, 0);
-            for(int i = 0; i < players.size(); i++)
-                players.get(i).changePosition(mapOffXInit-map.offsetX, 0);
+            character.setPosistion(Main.screenWidth/2, character.yPos, false);   
+            for (Player AI : AIs) 
+                AI.changePosition(mapOffXInit-map.offsetX, 0, false);
+            for (Player player : players)
+                player.changePosition(mapOffXInit-map.offsetX, 0, false);
         }   
         if((character.yPos>=Main.screenHeight/2 && map.mapPixelHeight-map.offsetY>Main.screenHeight) || (character.yPos<=Main.screenHeight/2 && map.offsetY>0)){
             int mapOffYInit = map.offsetY;
             map.changeOffset(0, character.yPos-Main.screenHeight/2);
-            character.setPosistion(character.xPos, Main.screenHeight/2);   
-            for(int i = 0; i < AIs.size(); i++)
-                AIs.get(i).changePosition(0, mapOffYInit-map.offsetY);
-            for(int i = 0; i < players.size(); i++)
-                players.get(i).changePosition(0, mapOffYInit-map.offsetY);
+            character.setPosistion(character.xPos, Main.screenHeight/2, false);   
+            for (Player AI : AIs)
+                AI.changePosition(0, mapOffYInit-map.offsetY, false);
+            for (Player player : players)
+                player.changePosition(0, mapOffYInit-map.offsetY, false);
         }
     }
 
     // Perform any custom painting (if necessary) in this method
     @Override  
     public void paintComponent(Graphics g){
-      super.paintComponent(g);
-      g.setColor(Color.BLACK);
-      map.drawMap(g);
+        super.paintComponent(g);
+        g.setColor(Color.BLACK);
+        map.drawMap(g);
 
-      while(settingSharedObject){System.out.println("Waiting in Paint");}
-      drawingSharedObject = true;
-      for(int i = 0; i < players.size(); i++){
-        if(!players.get(i).playerName.equals(clientName))
-              players.get(i).drawCharacter(g);
-      }
-
-      for(int i = 0; i < AIs.size(); i++){
-          AIs.get(i).drawCharacter(g);
-      }
-
-      character.drawCharacter(g);
-      
-      g.setColor(Color.BLACK);
-      g.fillRect(Main.screenWidth, 0, Main.screenPlusMessage-Main.screenWidth, Main.screenHeight);
-
-      boolean onlyOneLeft = true;
-      for(int i = 0; i < players.size(); i++){
-            if(!players.get(i).playerName.equals(clientName) && players.get(i).isAlive)
-                onlyOneLeft = false;
-            if(character.isAlive && players.get(i).isAlive && !players.get(i).playerName.equals(clientName)){
-                character.playerInteractions(players.get(i));
-                if(!character.isAlive)
-                    Client.clientOut.println(character.playerName+" slain by "+players.get(i).playerName);
+        while(settingSharedObject){System.out.println("Waiting in Paint");}
+        drawingSharedObject = true;
+        for (Player player : players) {
+            if (!player.playerName.equals(clientName)) {
+                player.drawCharacter(g);
             }
-      }
-      actions();
-      drawingSharedObject = false;
-      
-      if(!onlyOneLeft)
-          character.wonGame = false;
-      
-      if(onlyOneLeft && players.size() > 1 && !character.wonGame){
-          Client.clientOut.println("GAMEOVER "+character.playerName+" won the match");
-          character.wonGame = true;
-      }
-      
-      if(clientName != null )
-        Client.clientOut.println("SQUARE "+character.getInfoString(map.offsetX, map.offsetY));
+        }
+
+        for (Player AI : AIs)
+            AI.drawCharacter(g);
+
+        character.drawCharacter(g);
+
+        g.setColor(Color.BLACK);
+        g.fillRect(Main.screenWidth, 0, Main.screenPlusMessage-Main.screenWidth, Main.screenHeight);
+
+        boolean onlyOneLeft = true;
+        
+        for(Player AI : AIs){
+            if(AI.isAlive && character.isAlive){
+                character.playerInteractions(AI);
+                AI.playerInteractions(character);
+            }
+        }
+
+        for (Player player : players) {
+            if (!player.playerName.equals(clientName) && player.isAlive) {
+                onlyOneLeft = false;
+            }
+            if (character.isAlive && player.isAlive && !player.playerName.equals(clientName)) {
+                character.playerInteractions(player);
+                if (!character.isAlive) {
+                    Client.clientOut.println(character.playerName+" slain by " + player.playerName);
+                }
+            }
+        }
+        
+        actions();
+        drawingSharedObject = false;
+
+        if(!onlyOneLeft)
+            character.wonGame = false;
+
+        if(onlyOneLeft && players.size() > 1 && !character.wonGame){
+            Client.clientOut.println("GAMEOVER "+character.playerName+" won the match");
+            character.wonGame = true;
+        }
+
+        if(clientName != null )
+          Client.clientOut.println("SQUARE "+character.getInfoString(map.offsetX, map.offsetY));
     }
 
     @Override
@@ -204,26 +217,34 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
 
     @Override
     public void keyPressed(KeyEvent e){
-        //System.out.println(e.getKeyCode());
+        System.out.println(e.getKeyCode());
         if(e.getKeyCode() == 39)
-            lAC = true;
+            lAK = true;
         if(e.getKeyCode() == 37)
-            rAC = true;
-        if(e.getKeyCode() == 90)
-            uAC = true;
-        if(e.getKeyCode() == 88)
-            dAC = true;
+            rAK = true;
+        if(e.getKeyCode() == 87)
+            wAK = true;
+        if(e.getKeyCode() == 83)
+            sAK = true;
+        if(e.getKeyCode() == 65)
+            aAK = true;
+        if(e.getKeyCode() == 68)
+            dAK = true;
     }
 
     @Override
     public void keyReleased(KeyEvent e){
         if(e.getKeyCode() == 39)
-            lAC = false;
+            lAK = false;
         if(e.getKeyCode() == 37)
-            rAC = false;
-        if(e.getKeyCode() == 90)
-            uAC = false;
-        if(e.getKeyCode() == 88)
-            dAC = false;
+            rAK = false;
+        if(e.getKeyCode() == 87)
+            wAK = false;
+        if(e.getKeyCode() == 83)
+            sAK = false;
+        if(e.getKeyCode() == 65)
+            aAK = false;
+        if(e.getKeyCode() == 68)
+            dAK = false;
     }
 }

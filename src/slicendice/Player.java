@@ -16,6 +16,8 @@ public class Player {
     public double doubleXPos;
     public double doubleYPos;
     public String playerName;
+    public boolean isAlive = true;
+    public boolean wonGame = false;
     
     private int direction;
     private int viewWidth;
@@ -29,9 +31,14 @@ public class Player {
     private int fontSize = Main.circleRad;
     private Random r = new Random();
     private int health = Main.initHealth;
-    public boolean isAlive = true;
-    public boolean wonGame = false;
     private int speedMult = 2;
+    private int dirnMult = 2;
+    private int[] pathDeltaX;
+    private int[] pathDeltaY;
+    private int pathOn = 0;
+    private int pathDirn = 0;
+    private int totalDeltaX = 0;
+    private int totalDeltaY = 0;
     
     public Player(int x, int y, String n, boolean m){
         xPos = x;
@@ -71,7 +78,7 @@ public class Player {
         triangle.addPoint(xPos+Main.circleRad, yPos);
         stabPoint = new Point(xPos, yPos-Main.triangleHeight);
         c = new Color(Integer.parseInt(s[6]),Integer.parseInt(s[7]),Integer.parseInt(s[8]));
-        changePosition(0, 0);
+        changePosition(0, 0, true);
         nameWidth = -1;
         font = new Font("Arial",Font.BOLD,fontSize);
         health = Integer.parseInt(s[9]);
@@ -88,9 +95,9 @@ public class Player {
                 stabPointInt = true;
             if(stabPointInt || circlesTouch){
                 if(stabPointInt){
-                    changePosition((other.stabPoint.x-other.xPos)*2, (other.stabPoint.y-other.yPos)*2);
+                    changePosition((other.stabPoint.x-other.xPos)*2, (other.stabPoint.y-other.yPos)*2, true);
                     gotHit(Main.hitDamage);
-                    System.out.println("Hit at "+xPos+","+yPos+","+other.xPos+","+other.yPos+",");
+                    //System.out.println("Hit at "+xPos+","+yPos+","+other.xPos+","+other.yPos+",");
                 }
                 else{
                     double cVal = Math.sqrt(distSquared(xPos, yPos, other.xPos, other.yPos));
@@ -98,20 +105,20 @@ public class Player {
                     int xSep = (int) ((((Math.abs(xPos-other.xPos)*zVal)/cVal)-Math.abs(xPos-other.xPos))/2);
                     int ySep = (int) ((((Math.abs(yPos-other.yPos)*zVal)/cVal)-Math.abs(yPos-other.yPos))/2);
                     if(xPos>other.xPos){
-                        changePosition(xSep, 0);
-                        other.changePosition(-xSep, 0);
+                        changePosition(xSep, 0, true);
+                        other.changePosition(-xSep, 0, true);
                     }
                     else{
-                        changePosition(-xSep, 0);
-                        other.changePosition(xSep, 0);
+                        changePosition(-xSep, 0, true);
+                        other.changePosition(xSep, 0, true);
                     }
                     if(yPos>other.yPos){
-                        changePosition(0, ySep);
-                        other.changePosition(0, -ySep);
+                        changePosition(0, ySep, true);
+                        other.changePosition(0, -ySep, true);
                     }
                     else{
-                        changePosition(0, -ySep);
-                        other.changePosition(0, ySep);
+                        changePosition(0, -ySep, true);
+                        other.changePosition(0, ySep, true);
                     }
                 }
             }
@@ -152,6 +159,7 @@ public class Player {
         
         g2d.setTransform(old);
         
+        //player name
         g.setFont(font);
         if(nameWidth == -1)
             nameWidth = (int) g.getFontMetrics().getStringBounds(playerName, g).getWidth();
@@ -162,10 +170,11 @@ public class Player {
         g.setColor(Color.BLACK);
         g.drawString(playerName, xPos-nameWidth/2, yPos-(Main.circleRad*2+Main.circleRad/2));
         
+        //Health bar
         g.setColor(Color.BLACK);
         g.fillRect(xPos-Main.circleRad, yPos-Main.healthBarWidth/2, Main.circleRad*2, Main.healthBarWidth);
         
-        g.setColor(Color.GREEN);
+        g.setColor(new Color(255-map(health,0,Main.initHealth,0,255), map(health,0,Main.initHealth,0,255), 0));
         g.fillRect(xPos-Main.circleRad, yPos-(Main.healthBarWidth/2-2), (int) (((double)(health)/Main.initHealth)*Main.circleRad*2), Main.healthBarWidth-4);
         
         //g.fillOval(stabPoint.x, stabPoint.y, 4, 4);
@@ -173,38 +182,56 @@ public class Player {
     }
     
     //No Path
-    public void updatePosition(boolean lk, boolean rk, boolean uk, boolean dk){
+    public void updatePosition(boolean lk, boolean rk, boolean wk, boolean sk, boolean ak, boolean dk){
         if(isAlive){
-            if(uk)
+            if(wk)
                 speedMult = 4;
-            if(dk)
+            if(sk)
                 speedMult = 1;
-            if((dk && uk) || (!dk && !uk))
+            if((sk && wk) || (!sk && !wk))
                 speedMult = 2;
+            if(ak)
+                dirnMult = 4;
+            if(dk)
+                dirnMult = 1;
+            if((ak && dk) || (!ak && !dk))
+                dirnMult = 2;
             if(lk)
-                direction+=Main.dirSlowSpeed*speedMult;
+                direction+=Main.dirSlowSpeed*dirnMult;
             if(rk)
-                direction-=Main.dirSlowSpeed*speedMult;
-            changePosition(Math.cos(Math.toRadians(direction-90))*Main.moveSlowSpeed*speedMult, Math.sin(Math.toRadians(direction-90))*Main.moveSlowSpeed*speedMult);
+                direction-=Main.dirSlowSpeed*dirnMult;
+            changePosition(Math.cos(Math.toRadians(direction-90))*Main.moveSlowSpeed*speedMult, Math.sin(Math.toRadians(direction-90))*Main.moveSlowSpeed*speedMult, true);
         }
     }
     
     //Has Path
     public void updatePosition(){
         if(isAlive){
-        
+            direction = (int) Math.toDegrees(Math.atan2(pathDeltaX[pathOn], -pathDeltaY[pathOn]));
+            updatePosition(false,false,false,false,false,false);
+            if(Math.abs(totalDeltaX)>=Math.abs(pathDeltaX[pathOn]) && Math.abs(totalDeltaY)>=Math.abs(pathDeltaY[pathOn])){
+                changePosition(pathDeltaX[pathOn]-totalDeltaX, pathDeltaY[pathOn]-totalDeltaY, true);
+                pathOn++;
+                if(pathOn>=pathDeltaX.length)
+                    pathOn = 0;
+                totalDeltaX = 0;
+                totalDeltaY = 0;
+            }
         }
     }
     
     public void setPath(int[] xp, int[] yp){
-    
+        pathDeltaX = new int[xp.length];
+        System.arraycopy(xp, 0, pathDeltaX, 0, xp.length);
+        pathDeltaY = new int[yp.length];
+        System.arraycopy(yp, 0, pathDeltaY, 0, yp.length);
     }
     
-    public void setPosistion(int x, int y){
-        changePosition(x-xPos, y-yPos);
+    public void setPosistion(int x, int y, boolean pc){
+        changePosition(x-xPos, y-yPos, pc);
     }
     
-    public void changePosition(double cx, double cy){
+    public void changePosition(double cx, double cy, boolean pc){
         doubleXPos+=cx;
         doubleYPos+=cy;
         int actualCX = ((int)doubleXPos) - xPos;
@@ -213,17 +240,21 @@ public class Player {
         triangle.translate(actualCX, actualCY);
         xPos+=actualCX;
         yPos+=actualCY;
+        if(pc && !mapCentered){
+            totalDeltaX+=actualCX;
+            totalDeltaY+=actualCY;
+        }
         stabPoint.move((int) (xPos+Main.triangleHeight*Math.cos(Math.toRadians(direction-90))), (int) (yPos+Main.triangleHeight*Math.sin(Math.toRadians(direction-90))));
         if(mapCentered){
             if(xPos<Main.circleRad){
-                setPosistion(Main.circleRad, yPos);
+                setPosistion(Main.circleRad, yPos, pc);
             }
             if(xPos>viewWidth-Main.circleRad)
-                setPosistion(viewWidth-Main.circleRad, yPos);
+                setPosistion(viewWidth-Main.circleRad, yPos, pc);
             if(yPos<Main.circleRad)
-                setPosistion(xPos, Main.circleRad);
+                setPosistion(xPos, Main.circleRad, pc);
             if(yPos>viewHeight-Main.circleRad)
-                setPosistion(xPos, viewHeight-Main.circleRad);
+                setPosistion(xPos, viewHeight-Main.circleRad, pc);
         }
     }
     
@@ -234,5 +265,14 @@ public class Player {
     
     public String getInfoString(int ox, int oy){
         return playerName+","+xPos+","+yPos+","+direction+","+ox+","+oy+","+c.getRed()+","+c.getGreen()+","+c.getBlue()+","+health;
+    }
+    
+    public int map(int x, int in_min, int in_max, int out_min, int out_max){
+        int ret = (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+        if(ret > out_max)
+            return out_max;
+        if(ret < out_min)
+            return out_min;
+        return ret;
     }
 }
