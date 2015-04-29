@@ -50,7 +50,7 @@ public class Player {
         viewWidth = Main.screenWidth;
         viewHeight = Main.screenHeight;
         mapCentered = m;
-        c = new Color(r.nextInt(100)+150,r.nextInt(100)+150,r.nextInt(100)+150);
+        c = new Color(r.nextInt(150)+100,r.nextInt(250),r.nextInt(150)+100);
         triangle = new Polygon();
         triangle.addPoint(xPos-Main.circleRad, yPos);
         triangle.addPoint(xPos, yPos-Main.triangleHeight);
@@ -148,6 +148,16 @@ public class Player {
     }
     
     public void drawCharacter(Graphics g){
+        triangle = new Polygon();
+        triangle.addPoint(xPos-Main.circleRad, yPos);
+        triangle.addPoint(xPos, yPos-Main.triangleHeight);
+        triangle.addPoint(xPos+Main.circleRad, yPos);
+        if(fontSize != Main.circleRad){
+            fontSize = Main.circleRad;
+            font = new Font("Arial",Font.BOLD,fontSize);
+            nameWidth = -1;
+        }
+        
         Graphics2D g2d = (Graphics2D)g;
         AffineTransform old = g2d.getTransform();
         g2d.rotate(Math.toRadians(direction), xPos, yPos);
@@ -174,7 +184,7 @@ public class Player {
         g.setColor(Color.BLACK);
         g.fillRect(xPos-Main.circleRad, yPos-Main.healthBarWidth/2, Main.circleRad*2, Main.healthBarWidth);
         
-        g.setColor(new Color(255-map(health,0,Main.initHealth,0,255), map(health,0,Main.initHealth,0,255), 0));
+        g.setColor(new Color(255-Main.map(health,0,Main.initHealth,0,255), Main.map(health,0,Main.initHealth,0,255), 0));
         g.fillRect(xPos-Main.circleRad, yPos-(Main.healthBarWidth/2-2), (int) (((double)(health)/Main.initHealth)*Main.circleRad*2), Main.healthBarWidth-4);
         
         //g.fillOval(stabPoint.x, stabPoint.y, 4, 4);
@@ -190,9 +200,9 @@ public class Player {
                 speedMult = 1;
             if((sk && wk) || (!sk && !wk))
                 speedMult = 2;
-            if(ak)
-                dirnMult = 4;
             if(dk)
+                dirnMult = 4;
+            if(ak)
                 dirnMult = 1;
             if((ak && dk) || (!ak && !dk))
                 dirnMult = 2;
@@ -265,14 +275,5 @@ public class Player {
     
     public String getInfoString(int ox, int oy){
         return playerName+","+xPos+","+yPos+","+direction+","+ox+","+oy+","+c.getRed()+","+c.getGreen()+","+c.getBlue()+","+health;
-    }
-    
-    public int map(int x, int in_min, int in_max, int out_min, int out_max){
-        int ret = (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
-        if(ret > out_max)
-            return out_max;
-        if(ret < out_min)
-            return out_min;
-        return ret;
     }
 }

@@ -172,6 +172,8 @@ public class DrawPanel extends JPanel implements Runnable,KeyListener{
             AI.drawCharacter(g);
 
         character.drawCharacter(g);
+        
+        //Maybe add minimap. Map coordinates
 
         g.setColor(Color.BLACK);
         g.fillRect(Main.screenWidth, 0, Main.screenPlusMessage-Main.screenWidth, Main.screenHeight);

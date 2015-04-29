@@ -8,9 +8,9 @@ public class Main
     public static int PORT = 9001;
   
     public static int circleRad = 60;
-    public static int triangleHeight = 130;
+    public static int triangleHeight = 70;
     public static int dirSlowSpeed = 3;
-    public static int moveSlowSpeed = 5;
+    public static int moveSlowSpeed = 3;
     public static int initHealth = 80;
     public static int healthBarWidth = 8;
     public static int hitDamage = 10;
@@ -40,6 +40,15 @@ public class Main
             Client client = new Client();
             client.runClient();
         }
+    }
+    
+    public static int map(int x, int in_min, int in_max, int out_min, int out_max){
+        int ret = (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+        if(ret > out_max)
+            return out_max;
+        if(ret < out_min)
+            return out_min;
+        return ret;
     }
    
     public static String decodeLine(String inLines){
