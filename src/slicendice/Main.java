@@ -10,7 +10,7 @@ public class Main
     public static int circleRad = 30;
     public static int triangleHeight = 70;
     public static int dirSlowSpeed = 3;
-    public static int moveSlowSpeed = 3;
+    public static int moveSlowSpeed = 2;
     public static int initHealth = 80;
     public static int healthBarWidth = 8;
     public static int hitDamage = 10;
