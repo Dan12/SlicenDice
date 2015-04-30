@@ -7,7 +7,7 @@ public class Main
   // Declare instance variables here...
     public static int PORT = 9001;
   
-    public static int circleRad = 60;
+    public static int circleRad = 30;
     public static int triangleHeight = 70;
     public static int dirSlowSpeed = 3;
     public static int moveSlowSpeed = 3;
