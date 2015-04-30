@@ -19,7 +19,7 @@ public class Client{
     String text = "";
     DrawPanel drawPanel;
     String tempName = "";
-    String autoIpAdress = "10.3.11.102";
+    String autoIpAdress = "10.3.11.86";
 
     public Client(){
         // Layout GUI
